@@ -1,0 +1,11 @@
+{
+  "name": "reloop-mixon-4-mixxx",
+  "private": true,
+  "description": "Reloop Mixon 4 mapping fuer Mixxx - Entwicklungswerkzeuge",
+  "scripts": {
+    "lint": "eslint controllers/"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0"
+  }
+}

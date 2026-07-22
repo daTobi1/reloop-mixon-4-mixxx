@@ -1,0 +1,24 @@
+# Betriebssystem
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDEs / Editoren
+.vscode/
+.idea/
+
+# Build-Artefakte
+build/
+dist/
+out/
+*.log
+
+# Claude Code (lokale Einstellungen)
+.claude/settings.local.json
+
+# Node (ESLint-Werkzeuge)
+node_modules/
+package-lock.json
+
+# Temporaerer Upstream-Arbeitsordner
+.upstream/
