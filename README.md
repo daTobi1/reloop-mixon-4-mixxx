@@ -119,7 +119,8 @@ Von hier an lohnt es sich, die **Loops** und die **Pads** auszuprobieren (siehe 
 | **Pitch-Fader** | Tempo feinjustieren (sehr fein auflösend) | Fader-Start (hoch = Play, runter = Stopp) |
 | **Keylock** | Tonhöhe beim Tempo-Ändern einfrieren (LED) · 2 Sek. halten = Tempo auf 0 zurück | – |
 | **Key Sync** | Tonart an das andere Deck angleichen · Doppelklick = zurück zur Originaltonart | – |
-| **Slip** | Slip-Modus (LED): der Song läuft im Hintergrund weiter, auch während du scratchst | – |
+| **Slip** | Slip-Modus (LED): der Song läuft im Hintergrund weiter, auch während du scratchst | **Shift+Slip = Passthrough an/aus** (externer/Streaming-Eingang durch den Kanal) |
+| **PHONO** (nur Deck 3/4) | Passthrough an/aus (wie Shift+Slip) | – |
 | **Load** | Lädt den in der Bibliothek markierten Song ins Deck (LED = Song geladen) | – |
 
 ### Loops

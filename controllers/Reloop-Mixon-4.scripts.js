@@ -445,6 +445,21 @@ Mixon4.Deck = function(deckNumber, midiChannel) {
         }
     });
 
+    // Passthrough toggle: routes an external/streaming source fed into this
+    // deck's vinyl/passthrough input through the channel (EQ, filter, effects,
+    // fader). Shift + Slip (note 0x4F) works on every deck; the PHONO button
+    // additionally toggles it on decks 3/4 (note 0x13), where streaming
+    // sources usually sit. Neither has a controllable LED on the hardware.
+    const togglePassthrough = function(channel, control, value) {
+        if (value > 0) {
+            script.toggleControl(group, "passthrough");
+        }
+    };
+    midi.makeInputHandler(noteStatus, 0x4F, togglePassthrough);
+    if (deckNumber === 3 || deckNumber === 4) {
+        midi.makeInputHandler(noteStatus, 0x13, togglePassthrough);
+    }
+
     // FILTER FX button (note 0x01, LED hardware-controlled): assigns this
     // channel to its FX unit (decks 1/3 -> unit 1, decks 2/4 -> unit 2).
     const fxUnitNumber = (deckNumber % 2 === 1) ? 1 : 2;
