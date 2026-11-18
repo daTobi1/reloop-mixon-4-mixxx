@@ -110,7 +110,15 @@ Mixon4.COLORS = {
     pitchUp: 0x30, // red (positive semitones)
     fixedLoop: 0x0F, // cyan, bright (loop of this size active)
     fixedLoopDim: 0x4F, // cyan, dimmed (idle)
+    slicer: 0x33, // magenta, bright (segment currently playing)
+    slicerDim: 0x73, // magenta, dimmed (other segments)
+    slicerLoop: 0x23, // violet, bright
+    slicerLoopDim: 0x63, // violet, dimmed
+    pitchBase: 0x3F, // white: selected base hot cue (pitch play, shift layer)
 };
+
+// Slicer emulation: number of beats in a slicer window (one pad per beat)
+Mixon4.SLICER_BEATS = 8;
 
 // Maps Mixxx 24-bit colors (e.g. hotcue colors) to the nearest of the 64
 // bright palette colors of the controller.
@@ -603,13 +611,138 @@ Mixon4.Deck = function(deckNumber, midiChannel) {
         this.samplerButtons[i] = button;
     }
 
-    // Slicer bank (notes 0x18-0x1F): Mixxx has no slicer feature, so this
-    // bank does beatjumps instead - pads 1-4 jump backwards by 8/4/2/1
-    // beats, pads 5-8 forwards by 1/2/4/8 beats.
+    // ---- Slicer emulation ---------------------------------------------
+    // Mixxx has no slicer, so it is emulated on top of the beatgrid: a window
+    // of 8 beats is anchored at a beat, pad N jumps to beat N of the window.
+    // Jumps use "beatjump" with whole beats, so the phase inside the beat is
+    // kept (seamless, like a quantized jump). Precision depends on the
+    // beatgrid of the track.
+    //  - SLICER (pads 0x18-0x1F): the window follows playback in steps of
+    //    8 beats (classic slicer).
+    //  - SLICER LOOP (pads 0x38-0x3F): the window stays fixed; while a pad is
+    //    held, slip mode is on, so releasing it returns playback to where it
+    //    would have been.
+    // The previous assignments moved to the shift layer of each bank:
+    // SHIFT + SLICER = beatjumps, SHIFT + SLICER LOOP = fixed beatloops.
+    const beatSamples = function() {
+        const bpm = engine.getValue(group, "file_bpm");
+        const rate = engine.getValue(group, "track_samplerate");
+        return (bpm > 0 && rate > 0) ? 60 / bpm * rate * 2 : 0;
+    };
+    const positionSamples = function() {
+        return engine.getValue(group, "playposition") *
+            engine.getValue(group, "track_samples");
+    };
+    // Start of the beat the playhead is in (beat_distance = 0..1 within it)
+    const currentBeatStart = function() {
+        return positionSamples() -
+            engine.getValue(group, "beat_distance") * beatSamples();
+    };
+    const slicer = {
+        normal: {window: null, held: 0, base: 0x18,
+            on: Mixon4.COLORS.slicer, off: Mixon4.COLORS.slicerDim},
+        loop: {window: null, held: 0, base: 0x38,
+            on: Mixon4.COLORS.slicerLoop, off: Mixon4.COLORS.slicerLoopDim},
+        slipBefore: 0,
+    };
+    // Segment (0-7) of the playhead inside a window, or -1 if outside
+    const segmentOf = function(win) {
+        const beat = beatSamples();
+        if (win === null || beat <= 0) {
+            return -1;
+        }
+        const seg = Math.floor((positionSamples() - win) / beat + 1e-6);
+        return (seg >= 0 && seg < Mixon4.SLICER_BEATS) ? seg : -1;
+    };
+    const anchorWindow = function(bank) {
+        bank.window = engine.getValue(group, "track_loaded") ?
+            currentBeatStart() : null;
+    };
+    const jumpToSegment = function(bank, index) {
+        if (bank.window === null || beatSamples() <= 0) {
+            anchorWindow(bank);
+        }
+        let seg = segmentOf(bank.window);
+        if (seg < 0) {
+            // Playhead left the window (seek, track change): re-anchor
+            anchorWindow(bank);
+            seg = 0;
+        }
+        const delta = index - seg;
+        if (delta !== 0) {
+            engine.setValue(group, "beatjump", delta);
+        }
+    };
+    const updateSlicerLeds = function(bank) {
+        const seg = segmentOf(bank.window);
+        for (let i = 0; i < Mixon4.SLICER_BEATS; i++) {
+            Mixon4.sendLed(padStatus, bank.base + i,
+                bank.window === null ? Mixon4.COLORS.off :
+                    (i === seg ? bank.on : bank.off));
+        }
+    };
+    // Window follow-up and LED tracking (20 Hz is plenty for beat steps)
+    this.slicerTimer = engine.beginTimer(50, function() {
+        const beat = beatSamples();
+        const normal = slicer.normal;
+        if (normal.window !== null && beat > 0) {
+            const pos = positionSamples();
+            const span = beat * Mixon4.SLICER_BEATS;
+            if (pos >= normal.window + span || pos < normal.window - beat) {
+                // classic slicer: window moves on in 8-beat steps
+                normal.window += Math.floor((pos - normal.window) / span) * span;
+            }
+        }
+        if (!engine.getValue(group, "track_loaded")) {
+            slicer.normal.window = null;
+            slicer.loop.window = null;
+        }
+        updateSlicerLeds(slicer.normal);
+        updateSlicerLeds(slicer.loop);
+    });
+    // Entering a slicer mode (mode buttons on the deck channel) anchors the
+    // window at the current beat.
+    midi.makeInputHandler(noteStatus, 0x19, function(channel, control, value) {
+        if (value > 0) {
+            anchorWindow(slicer.normal);
+        }
+    });
+    midi.makeInputHandler(noteStatus, 0x1D, function(channel, control, value) {
+        if (value > 0) {
+            anchorWindow(slicer.loop);
+        }
+    });
+    for (let i = 0; i < Mixon4.SLICER_BEATS; i++) {
+        bindPad(0x18 + i, function(channel, control, value) {
+            if (value > 0) {
+                jumpToSegment(slicer.normal, i);
+            }
+        });
+        bindPad(0x38 + i, function(channel, control, value) {
+            const bank = slicer.loop;
+            if (value > 0) {
+                if (bank.held === 0) {
+                    slicer.slipBefore = engine.getValue(group, "slip_enabled");
+                    engine.setValue(group, "slip_enabled", 1);
+                }
+                bank.held++;
+                jumpToSegment(bank, i);
+            } else if (bank.held > 0) {
+                bank.held--;
+                if (bank.held === 0 && !slicer.slipBefore) {
+                    // slip off = playback returns to the slipped position
+                    engine.setValue(group, "slip_enabled", 0);
+                }
+            }
+        });
+    }
+
+    // SHIFT + SLICER (notes 0x58-0x5F): beatjumps - pads 1-4 jump backwards
+    // by 8/4/2/1 beats, pads 5-8 forwards by 1/2/4/8 beats.
     const BEATJUMPS = [-8, -4, -2, -1, 1, 2, 4, 8];
     this.beatjumpPads = [];
     BEATJUMPS.forEach(function(beats, index) {
-        const note = 0x18 + index;
+        const note = 0x58 + index;
         const button = new components.Button({
             midi: [padStatus, note],
             group: group,
@@ -668,23 +801,57 @@ Mixon4.Deck = function(deckNumber, midiChannel) {
         this.savedLoopPads[i] = button;
     }
 
-    // Pitch play bank (notes 0x30-0x37): semitone offsets around the
-    // original key via the "pitch" control (blue = down, white = original,
-    // red = up; the active offset lights bright). Shift resets the key.
+    // Pitch play bank (notes 0x30-0x37): like Serato Pitch Play - a pad
+    // restarts playback from the BASE HOT CUE at a semitone offset
+    // (blue = down, white = original key, red = up; the active offset lights
+    // bright). SHIFT + pad 1-8 selects hot cue 1-8 as the base cue (default
+    // hot cue 1; the selected one lights white on the shift layer).
+    // Without a set base cue the pad only changes the key, as before.
+    // Keylock is switched on, otherwise the key change would alter the tempo.
     const PITCH_OFFSETS = [-4, -3, -2, -1, 0, 1, 2, 3];
+    this.pitchPlayBase = 1;
+    const updateBaseLeds = function() {
+        for (let i = 1; i <= 8; i++) {
+            const isSet = engine.getValue(group, `hotcue_${i}_status`) > 0 ||
+                engine.getValue(group, `hotcue_${i}_enabled`) > 0;
+            let color = Mixon4.COLORS.off;
+            if (i === theDeck.pitchPlayBase) {
+                color = isSet ? Mixon4.COLORS.pitchBase : Mixon4.COLORS.pitchBase + 0x40;
+            }
+            Mixon4.sendLed(padStatus, 0x70 + i - 1, color);
+        }
+    };
     PITCH_OFFSETS.forEach(function(offset, index) {
         const note = 0x30 + index;
         bindPad(note, function(channel, control, value) {
-            if (value > 0) {
-                engine.setValue(group, "pitch", offset);
+            if (value === 0) {
+                return;
+            }
+            if (!engine.getValue(group, "keylock")) {
+                engine.setValue(group, "keylock", 1);
+            }
+            engine.setValue(group, "pitch", offset);
+            const base = theDeck.pitchPlayBase;
+            const baseSet = engine.getValue(group, `hotcue_${base}_status`) > 0 ||
+                engine.getValue(group, `hotcue_${base}_enabled`) > 0;
+            if (baseSet) {
+                engine.setValue(group, `hotcue_${base}_gotoandplay`, 1);
             }
         });
+        // SHIFT + pad: choose the base hot cue
         bindPad(note + 0x40, function(channel, control, value) {
             if (value > 0) {
-                engine.setValue(group, "pitch", 0);
+                theDeck.pitchPlayBase = index + 1;
+                updateBaseLeds();
             }
         });
     });
+    this.pitchBaseConnections = [];
+    for (let i = 1; i <= 8; i++) {
+        this.pitchBaseConnections.push(
+            engine.makeConnection(group, `hotcue_${i}_status`, updateBaseLeds));
+    }
+    updateBaseLeds();
     this.pitchLedsConnection = engine.makeConnection(group, "pitch",
         function(value) {
             PITCH_OFFSETS.forEach(function(offset, index) {
@@ -703,12 +870,12 @@ Mixon4.Deck = function(deckNumber, midiChannel) {
         });
     this.pitchLedsConnection.trigger();
 
-    // Fixed loop bank ("slicer loop" notes 0x38-0x3F): toggles beatloops of
-    // fixed sizes 1/8-16; the pad of an active loop size lights bright.
+    // SHIFT + SLICER LOOP (notes 0x78-0x7F): toggles beatloops of fixed
+    // sizes 1/8-16; the pad of an active loop size lights bright.
     const FIXED_LOOPS = [1 / 8, 1 / 4, 1 / 2, 1, 2, 4, 8, 16];
     this.fixedLoopPads = [];
     FIXED_LOOPS.forEach(function(size, index) {
-        const note = 0x38 + index;
+        const note = 0x78 + index;
         const button = new components.Button({
             midi: [padStatus, note],
             group: group,

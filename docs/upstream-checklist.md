@@ -5,16 +5,16 @@ Ziel: Pull Request, der das Reloop-Mixon-4-Mapping offiziell in Mixxx aufnimmt.
 ## Voraussetzungen (aus den Mixxx-Contribution-Richtlinien)
 
 - [ ] Mapping vollständig am Gerät getestet (Regressionstest aller Sektionen)
-- [ ] ESLint sauber (`npm run lint`; Mixxx lintet `res/controllers` im CI)
-- [ ] Dateinamen nach Konvention: `Reloop-Mixon-4.midi.xml` / `Reloop-Mixon-4.scripts.js` ✓
-- [ ] GPL-v2+-kompatibel, keine Fremdcode-Kopien ohne Lizenzangabe ✓ (nur offizielle Reloop-MIDI-Spezifikation als Datenquelle)
+- [x] ESLint sauber (`npm run lint`; Mixxx lintet `res/controllers` im CI)
+- [x] Dateinamen nach Konvention: `Reloop-Mixon-4.midi.xml` / `Reloop-Mixon-4.scripts.js` ✓
+- [x] GPL-v2+-kompatibel, keine Fremdcode-Kopien ohne Lizenzangabe ✓ (nur offizielle Reloop-MIDI-Spezifikation als Datenquelle)
 
 ## Ablauf
 
 1. [x] Fork von `mixxxdj/mixxx` (→ `daTobi1/mixxx`), Branch `reloop-mixon-4-mapping` von `main`
 2. [x] Beide Dateien nach `res/controllers/` kopiert (upstream-angepasste `<info>`: `mixxxVersion="2.5.0+"`, ohne `<wiki>`); Branch liegt fertig auf dem Fork
-3. [ ] **Forum-Thread im Mixxx-Discourse** (Kategorie Controller mappings) posten — Entwurf: `docs/forum-post-draft.md`. Danach Thread-URL ins `<forums>`-Feld der Mapping-XML eintragen (auf dem Fork-Branch)
-4. [ ] Nutzer-Feedback aus dem Forum einarbeiten
+3. [x] **Forum-Thread im Mixxx-Discourse** (Kategorie Controller mappings) posten — Entwurf: `docs/forum-post-draft.md`. Danach Thread-URL ins `<forums>`-Feld der Mapping-XML eintragen (auf dem Fork-Branch)
+4. [ ] Nutzer-Feedback aus dem Forum einarbeiten (Jog-Nudge + Pitch-Bereich aus Thread #2–#5 erledigt, PR #3)
 5. [ ] PR öffnen (Text steht in `docs/pr-body-draft.md`):
    ```
    gh pr create -R mixxxdj/mixxx --base main \
