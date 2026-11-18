@@ -43,7 +43,7 @@ Aufbereitet aus der offiziellen `Reloop-Mixon4_MIDI-Map.pdf` (gleicher Ordner). 
 | 0D | Cue | 0D | 4D | 4D | |
 | 0E | Sync | 0E | 4E | 4E | |
 | 0F | Slip | 0F | 4F | HW | |
-| 10 | Key Lock | 10 | 50 | 50 | sendet bei Loslassen |
+| 10 | Key Lock | 10 | 50 | 50 | sendet bei Loslassen · Shift = Pitch-Bereich umschalten |
 | 11 | Key Sync | 11 | 51 | 51 | bei Loslassen |
 | 12 | Deck-Umschaltung | HW | 52 (Shift) | HW | wechselt 1↔3 bzw. 2↔4 |
 | 13 / 14 | Phono / Line | — | — | — | nur Deck 3/4 |

@@ -117,7 +117,7 @@ Von hier an lohnt es sich, die **Loops** und die **Pads** auszuprobieren (siehe 
 | **Jog-Teller (am Rand)** | Song leicht anschubsen/bremsen (Feintuning) | – |
 | **Jog-LED-Ring** | Zeigt, wie weit der Song fortgeschritten ist | – |
 | **Pitch-Fader** | Tempo feinjustieren (sehr fein auflösend) | Fader-Start (hoch = Play, runter = Stopp) |
-| **Keylock** | Tonhöhe beim Tempo-Ändern einfrieren (LED) · 2 Sek. halten = Tempo auf 0 zurück | – |
+| **Keylock** | Tonhöhe beim Tempo-Ändern einfrieren (LED) · 2 Sek. halten = Tempo auf 0 zurück | Pitch-Bereich umschalten: ±6 → 8 → 10 → 16 → 24 → 50 % (LED blinkt kurz, das Tempo bleibt erhalten) |
 | **Key Sync** | Tonart an das andere Deck angleichen · Doppelklick = zurück zur Originaltonart | – |
 | **Slip** | Slip-Modus (LED): der Song läuft im Hintergrund weiter, auch während du scratchst | **Shift+Slip = Passthrough an/aus** (externer/Streaming-Eingang durch den Kanal) |
 | **PHONO** (nur Deck 3/4) | Passthrough an/aus (wie Shift+Slip) | – |
@@ -216,7 +216,7 @@ Wenn nichts hilft: [ein Issue eröffnen](../../issues) und dabei dein Betriebssy
 
 - **Kein echter Slicer:** Mixxx bietet die Funktion nicht; die Slicer-Modi sind ersatzweise mit Beatjump und festen Loops belegt.
 - **Pitch Play** verändert bislang die Tonhöhe des laufenden Songs (echtes Neuanspielen ab einer Marke ist in Arbeit).
-- **Jog-Empfindlichkeit** ist ein Erfahrungswert (Reloop dokumentiert die genaue Auflösung nicht). Fühlt sich das Scratchen zu schnell/langsam an, lässt sich das im Skript unter `Mixon4.JOG.wheelResolution` anpassen.
+- **Jog-Empfindlichkeit** ist ein Erfahrungswert (Reloop dokumentiert die genaue Auflösung nicht). Fühlt sich das Scratchen zu schnell/langsam an, lässt sich das im Skript unter `Mixon4.JOG.wheelResolution` anpassen. Wie stark der Teller am Rand anschubst/bremst, steuert `Mixon4.JOG.nudgeSensitivity` (Standard 0.1, kleiner = sanfter) – dafür muss `midi-components-0.0.js` nicht mehr verändert werden.
 
 ## Deinstallation
 
