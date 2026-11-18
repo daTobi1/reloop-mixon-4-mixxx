@@ -190,6 +190,13 @@
             </control>
             <control>
                 <group>[Channel1]</group>
+                <key>Mixon4.deck1.pitchRange</key>
+                <status>0x94</status>
+                <midino>0x50</midino>
+                <options><script-binding/></options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
                 <key>Mixon4.deck1.autoLoop.input</key>
                 <status>0x94</status>
                 <midino>0x08</midino>
@@ -411,6 +418,13 @@
                 <key>Mixon4.deck2.keylockHold</key>
                 <status>0x95</status>
                 <midino>0x25</midino>
+                <options><script-binding/></options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>Mixon4.deck2.pitchRange</key>
+                <status>0x95</status>
+                <midino>0x50</midino>
                 <options><script-binding/></options>
             </control>
             <control>
@@ -640,6 +654,13 @@
             </control>
             <control>
                 <group>[Channel3]</group>
+                <key>Mixon4.deck3.pitchRange</key>
+                <status>0x96</status>
+                <midino>0x50</midino>
+                <options><script-binding/></options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
                 <key>Mixon4.deck3.autoLoop.input</key>
                 <status>0x96</status>
                 <midino>0x08</midino>
@@ -861,6 +882,13 @@
                 <key>Mixon4.deck4.keylockHold</key>
                 <status>0x97</status>
                 <midino>0x25</midino>
+                <options><script-binding/></options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>Mixon4.deck4.pitchRange</key>
+                <status>0x97</status>
+                <midino>0x50</midino>
                 <options><script-binding/></options>
             </control>
             <control>

@@ -30,7 +30,14 @@ Mixon4.JOG = {
     alpha: 1 / 8,
     beta: 1 / 8 / 32,
     rpm: 33 + 1 / 3,
+    // Nudge sensitivity when the platter top is not touched (pitch bend).
+    // 1.0 = Components default, which feels far too strong with the
+    // high-resolution Mixon 4 jogs; lower = gentler nudging.
+    nudgeSensitivity: 0.1,
 };
+
+// Pitch fader ranges cycled by SHIFT + KEY LOCK (fraction, 0.08 = ±8 %)
+Mixon4.PITCH_RANGES = [0.06, 0.08, 0.10, 0.16, 0.24, 0.50];
 
 // --------------------------------------------------------------------------
 // Layer 1: MIDI specification
@@ -387,6 +394,33 @@ Mixon4.Deck = function(deckNumber, midiChannel) {
             engine.setValue(group, "rate", 0);
         }
     };
+    // SHIFT + KEY LOCK (note 0x50): cycle the pitch fader range through
+    // Mixon4.PITCH_RANGES. The current tempo is kept by rescaling "rate";
+    // the 14-bit pitch fader then picks up again via soft-takeover. The LED
+    // flashes once per step as confirmation.
+    this.pitchRange = function(channel, control, value) {
+        if (value === 0) {
+            return;
+        }
+        const ranges = Mixon4.PITCH_RANGES;
+        const current = engine.getValue(group, "rateRange");
+        let next = ranges[0];
+        for (let i = 0; i < ranges.length; i++) {
+            if (ranges[i] > current + 0.0001) {
+                next = ranges[i];
+                break;
+            }
+        }
+        const rate = engine.getValue(group, "rate");
+        engine.setValue(group, "rateRange", next);
+        engine.setValue(group, "rate", Math.max(-1, Math.min(1, rate * current / next)));
+        Mixon4.sendNote(midiChannel, 0x50, 0x7F);
+        engine.beginTimer(200, function() {
+            Mixon4.sendNote(midiChannel, 0x50, 0x00);
+        }, true);
+        console.log(`Mixon 4: ${group} pitch range ±${Math.round(next * 100)} %`);
+    };
+
     this.keySync = new components.Button({ // match musical key to other deck
         midi: [noteStatus, 0x11],
         key: "sync_key",
@@ -415,6 +449,18 @@ Mixon4.Deck = function(deckNumber, midiChannel) {
         // two's complement, so override the scaling.
         inValueScale: function(value) {
             return value - 0x40;
+        },
+        // Same as JogWheelBasic.inputWheel, but the nudge path (platter not
+        // touched) is scaled by Mixon4.JOG.nudgeSensitivity. Scratching is
+        // unchanged. Keeps the fix inside the mapping instead of editing the
+        // shared midi-components-0.0.js.
+        inputWheel: function(_channel, _control, value) {
+            value = this.inValueScale(value);
+            if (engine.isScratching(this.deck)) {
+                engine.scratchTick(this.deck, value);
+            } else {
+                this.inSetValue(value * Mixon4.JOG.nudgeSensitivity);
+            }
         },
     });
 
