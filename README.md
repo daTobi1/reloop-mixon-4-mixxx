@@ -174,13 +174,13 @@ Die 8 farbigen Pads pro Seite haben mehrere Modi. Umgeschaltet wird über die Mo
 | **Hot Cue** | Sprungmarken 1–8 setzen und anspringen (Pad leuchtet in der Cue-Farbe) | Marke löschen |
 | **Loop Roll** | Kurze Wiederhol-Schleifen 1/32–4 Beats, solange gedrückt (blau) | – |
 | **Sampler** | Sampler 1–8 abspielen oder laden (weiß = geladen, grün = spielt) | Stoppen bzw. auswerfen |
-| **Slicer** | Im Song springen (Beatjump −8/−4/−2/−1/+1/+2/+4/+8) | – |
+| **Slicer** | Die nächsten 8 Beats liegen auf den 8 Pads: Pad = an diesen Beat springen, der laufende Beat leuchtet hell (magenta). Das Fenster wandert alle 8 Beats mit | Im Song springen (Beatjump −8/−4/−2/−1/+1/+2/+4/+8) |
 | **Cue Loop** | Schleife ab einer Sprungmarke starten | Marke löschen |
 | **Saved Loops** | Schleifen speichern und wieder abrufen (Marken 9–16) | Marke löschen |
-| **Pitch Play** | Song in verschiedenen Tonhöhen anspielen (blau = tiefer, weiß = original, rot = höher) | Zurück zur Originaltonart |
-| **Slicer Loop** | Feste Schleifenlängen 1/8–16 Beats an-/ausschalten (türkis) | – |
+| **Pitch Play** | Spielt ab dem Basis-Hot-Cue in der Tonhöhe des Pads neu an (blau = tiefer, weiß = original, rot = höher) – wie Pitch Play bei Serato. Ohne gesetzten Basis-Cue ändert sich nur die Tonhöhe. Keylock wird dabei eingeschaltet | Pad 1–8 = Basis-Hot-Cue wählen (Standard: Hot Cue 1, leuchtet weiß) |
+| **Slicer Loop** | Wie Slicer, aber das 8-Beat-Fenster bleibt stehen. Solange ein Pad gehalten wird, ist Slip an – beim Loslassen läuft der Song dort weiter, wo er ohne Eingriff wäre (violett) | Feste Schleifenlängen 1/8–16 Beats an-/ausschalten (türkis) |
 
-> Hinweis: Mixxx hat keine echte „Slicer"-Funktion wie Serato. Die beiden Slicer-Modi sind hier deshalb mit den sinnvollsten Alternativen (Beatjump bzw. feste Loops) belegt. Eine echte Slicer-Nachbildung ist [in Arbeit](../../issues).
+> Hinweis: Mixxx hat keine eingebaute Slicer-Funktion wie Serato. Das Mapping bildet sie anhand des Beatgrids nach: Beim Wechsel in den Slicer-Modus wird das 8-Beat-Fenster am aktuellen Beat verankert, die Sprünge erfolgen in ganzen Beats (der Takt bleibt erhalten). Wie genau das klappt, hängt vom Beatgrid des Songs ab. In der Wellenform werden die Segmente nicht angezeigt.
 
 ## Wichtig zu wissen: „Soft-Takeover"
 
@@ -214,8 +214,8 @@ Wenn nichts hilft: [ein Issue eröffnen](../../issues) und dabei dein Betriebssy
 
 ## Bekannte Grenzen
 
-- **Kein echter Slicer:** Mixxx bietet die Funktion nicht; die Slicer-Modi sind ersatzweise mit Beatjump und festen Loops belegt.
-- **Pitch Play** verändert bislang die Tonhöhe des laufenden Songs (echtes Neuanspielen ab einer Marke ist in Arbeit).
+- **Slicer ist nachgebildet:** Mixxx hat keinen eingebauten Slicer; das Mapping emuliert ihn über das Beatgrid. Bei Songs mit ungenauem Beatgrid landen die Sprünge entsprechend ungenau, und die Segmente erscheinen nicht in der Wellenform.
+- **Pitch Play** braucht einen gesetzten Basis-Hot-Cue zum Neuanspielen; ohne ihn ändert ein Pad nur die Tonhöhe des laufenden Songs.
 - **Jog-Empfindlichkeit** ist ein Erfahrungswert (Reloop dokumentiert die genaue Auflösung nicht). Fühlt sich das Scratchen zu schnell/langsam an, lässt sich das im Skript unter `Mixon4.JOG.wheelResolution` anpassen. Wie stark der Teller am Rand anschubst/bremst, steuert `Mixon4.JOG.nudgeSensitivity` (Standard 0.1, kleiner = sanfter) – dafür muss `midi-components-0.0.js` nicht mehr verändert werden.
 
 ## Deinstallation

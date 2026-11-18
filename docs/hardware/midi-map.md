@@ -65,16 +65,16 @@ Aufbereitet aus der offiziellen `Reloop-Mixon4_MIDI-Map.pdf` (gleicher Ordner). 
 
 Pro Modus 8 Pads; Note-On = Druck, `Bn` gleiche Adresse = Velocity, `An` = Aftertouch. Shift-Ebene = Note + 0x40.
 
-| Modus | Pad-Noten (Basis) | Shift |
-|---|---|---|
-| Hot Cue | 00–07 | 40–47 |
-| Loop Roll | 08–0F | 48–4F |
-| Sampler | 10–17 | 50–57 |
-| Slicer | 18–1F | 58–5F |
-| Cue Loop | 20–27 | 60–67 |
-| Saved Loops | 28–2F | 68–6F |
-| Pitch Play | 30–37 | 70–77 |
-| Slicer Loop | 38–3F | 78–7F |
+| Modus | Pad-Noten (Basis) | Shift | Belegung im Mapping |
+|---|---|---|---|
+| Hot Cue | 00–07 | 40–47 | Shift = Hot Cue löschen |
+| Loop Roll | 08–0F | 48–4F | |
+| Sampler | 10–17 | 50–57 | Shift = Stopp/Auswerfen |
+| Slicer | 18–1F | 58–5F | Slicer-Emulation · Shift = Beatjump |
+| Cue Loop | 20–27 | 60–67 | Shift = Hot Cue löschen |
+| Saved Loops | 28–2F | 68–6F | Shift = Hot Cue löschen |
+| Pitch Play | 30–37 | 70–77 | ab Basis-Hot-Cue anspielen · Shift = Basis-Cue wählen |
+| Slicer Loop | 38–3F | 78–7F | Slicer mit festem Fenster + Slip · Shift = feste Loops |
 
 **Pad-LEDs (RGB):** Note-On an die Pad-Adresse mit 7-Bit-Farbwert:
 

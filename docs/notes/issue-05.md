@@ -14,5 +14,5 @@
 
 ## Offene Punkte
 
-- Shift-Varianten Keylock (0x50) / Key Sync (0x51) unbelegt — Kandidat für Issue #10 (z. B. Rate-Range umschalten).
+- ~~Shift-Varianten Keylock (0x50) / Key Sync (0x51) unbelegt~~ → Shift + Keylock schaltet seit PR #3 den Pitch-Bereich (6/8/10/16/24/50 %). Shift + Key Sync (0x51) weiterhin frei.
 - Gerätetest: Pitch-Richtung prüfen (Fader runter = schneller?). Falls invertiert: Vorzeichen in `Mixon4.deck*.pitch` drehen.

@@ -4,7 +4,7 @@
         <name>Reloop Mixon 4</name>
         <author>daTobi1</author>
         <description>4-deck mapping for the Reloop Mixon 4 with full LED feedback (RGB pads, jog ring, loop LEDs, VU meters). Based on the official Reloop MIDI map.</description>
-        <forums>https://github.com/daTobi1/reloop-mixon-4-mixxx</forums>
+        <forums>https://mixxx.discourse.group/t/reloop-mixon-4-mapping-with-full-led-feedback-testers-welcome/34005</forums>
         <wiki>https://github.com/daTobi1/reloop-mixon-4-mixxx/blob/main/docs/architecture.md</wiki>
     </info>
     <controller id="Mixon 4">
